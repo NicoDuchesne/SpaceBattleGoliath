@@ -18,6 +18,7 @@ namespace GoliathTeam {
         BlackboardVariable<Vector2> posEnemy;
         BlackboardVariable<float> playerOrientation;
         BlackboardVariable<bool> canHit;
+        BlackboardVariable<int> waypointScore;
 
         public override void Initialize(SpaceShipView spaceship, GameData data) {
             behavior = GetComponent<BehaviorGraphAgent>();
@@ -33,6 +34,8 @@ namespace GoliathTeam {
             behavior.BlackboardReference.GetVariable("posEnemy", out posEnemy);
             behavior.BlackboardReference.GetVariable("playerOrientation", out playerOrientation);
             behavior.BlackboardReference.GetVariable("canHit", out canHit);
+            behavior.BlackboardReference.GetVariable("waypointScore", out waypointScore);
+
         }
 
         public override InputData UpdateInput(SpaceShipView spaceship, GameData data) {
@@ -44,8 +47,7 @@ namespace GoliathTeam {
             posPlayer.Value = spaceship.Position;
             posEnemy.Value = otherSpaceship.Position;
             playerOrientation.Value = spaceship.Orientation;
-
-            Debug.Log($"[STUN CHECK] Ennemi Réel: {otherSpaceship.StunPenaltyCountdown} | Blackboard: {(enemyStunPenaltyCountdown != null ? enemyStunPenaltyCountdown.Value : "NULL")}");
+            waypointScore.Value = spaceship.WaypointScore;
 
             return new InputData(thrust.Value, targetOrient.Value, needShoot.Value, false, triggerShockwave.Value);
         }
