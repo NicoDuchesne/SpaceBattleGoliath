@@ -11,20 +11,22 @@ public partial class CheckTakeWaypointCondition : Condition
 
     public override bool IsTrue()
     {
-        if(WaypointScore == null || OldWaypointScore == null)
+        if (WaypointScore == null || OldWaypointScore == null)
         {
             return false;
         }
 
-        if(WaypointScore.Value != OldWaypointScore.Value)
+        int currentScore = WaypointScore.Value;
+        int previousScore = OldWaypointScore.Value;
+
+        if (currentScore != previousScore)
         {
-            OldWaypointScore.Value = WaypointScore.Value;
-            return true;
-        }
-        else
-        {
-            return false;
+            OldWaypointScore.Value = currentScore;
+
+            return currentScore > previousScore;
         }
 
+        return false;
     }
 }
+
