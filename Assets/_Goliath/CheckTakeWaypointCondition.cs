@@ -3,7 +3,7 @@ using Unity.Behavior;
 using UnityEngine;
 
 [Serializable, Unity.Properties.GeneratePropertyBag]
-[Condition(name: "Check Take Waypoint", story: "Check si [waypointScore] et different de [oldWaypointScore] si different return true", category: "Conditions", id: "0be30b0e8758e78b2ef86c86d776c767")]
+[Condition(name: "Check Take Waypoint", story: "Check si [waypointScore] est different de [oldWaypointScore] si different return true", category: "Conditions", id: "0be30b0e8758e78b2ef86c86d776c767")]
 public partial class CheckTakeWaypointCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<int> WaypointScore;
