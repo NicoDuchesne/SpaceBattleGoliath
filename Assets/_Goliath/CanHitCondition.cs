@@ -1,10 +1,11 @@
 using DoNotModify;
 using System;
+using TMPro;
 using Unity.Behavior;
 using UnityEngine;
 
 [Serializable, Unity.Properties.GeneratePropertyBag]
-[Condition(name: "CanHit", story: "[playerVaisseau] : Déterminer si une cible [posEnemy] en mouvement sera touché par un tir du vaisseau [posPlayer] avec un intervalle de temps de tolérance donné [hitTimeTolerance] [enemyVelocity].", category: "Conditions", id: "9273bf9765957ee45070356bdce1b1a7")]
+[Condition(name: "CanHit", story: "[playerVaisseau] : Déterminer si une cible [posEnemy] en mouvement sera touché par un tir du vaisseau [posPlayer] avec un intervalle de temps de tolérance donné [hitTimeTolerance] [enemyVelocity] et [angleTolerance] / mais si false check si une cible immobile.", category: "Conditions", id: "9273bf9765957ee45070356bdce1b1a7")]
 public partial class CanHitCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<Vector2> posPlayer;
@@ -22,6 +23,13 @@ public partial class CanHitCondition : Condition
             return false;
         }
 
-        return AimingHelpers.CanHit(playerVaisseau.Value.view, posEnemy.Value, enemyVelocity.Value, hitTimeTolerance.Value);
+        bool canHit = AimingHelpers.CanHit(playerVaisseau.Value.view, posEnemy.Value, enemyVelocity.Value, hitTimeTolerance.Value);
+
+        if (!canHit)
+        {
+            canHit = AimingHelpers.CanHit(playerVaisseau.Value.view, posEnemy.Value, angleTolerance.Value);
+        }
+
+        return canHit;
     }
 }
