@@ -1,4 +1,5 @@
 ﻿using DoNotModify;
+using System.Reflection;
 using Unity.Behavior;
 using UnityEngine;
 
@@ -20,6 +21,13 @@ namespace GoliathTeam {
         BlackboardVariable<bool> canHit;
         BlackboardVariable<int> waypointScore;
         BlackboardVariable<bool> canDropMine;
+        BlackboardVariable<float> hitTimeTolerance;
+        BlackboardVariable<SpaceShip> playerVaisseau;
+        BlackboardVariable<float> angleTolerance;
+        BlackboardVariable<Vector2> enemyVelocity;
+
+
+        private static readonly FieldInfo SpaceShipField = typeof(SpaceShipView).GetField("_spaceship", BindingFlags.NonPublic | BindingFlags.Instance);//pour recup  le SpaceShip
 
         public override void Initialize(SpaceShipView spaceship, GameData data) {
             behavior = GetComponent<BehaviorGraphAgent>();
@@ -37,7 +45,20 @@ namespace GoliathTeam {
             behavior.BlackboardReference.GetVariable("canHit", out canHit);
             behavior.BlackboardReference.GetVariable("waypointScore", out waypointScore);
             behavior.BlackboardReference.GetVariable("canDropMine", out canDropMine);
+            behavior.BlackboardReference.GetVariable("hitTimeTolerance", out hitTimeTolerance);
+            behavior.BlackboardReference.GetVariable("playerVaisseau", out playerVaisseau);
+            behavior.BlackboardReference.GetVariable("enemyVelocity", out enemyVelocity);
 
+            if (playerVaisseau != null && SpaceShipField != null)
+            {
+                playerVaisseau.Value = SpaceShipField.GetValue(spaceship) as SpaceShip;
+            }
+
+            behavior.BlackboardReference.GetVariable("angleTolerance", out angleTolerance);
+            if (angleTolerance != null && angleTolerance.Value == 0)
+            {
+                angleTolerance.Value = 10.0f; 
+            }
         }
 
         public override InputData UpdateInput(SpaceShipView spaceship, GameData data) {
@@ -50,8 +71,9 @@ namespace GoliathTeam {
             posEnemy.Value = otherSpaceship.Position;
             playerOrientation.Value = spaceship.Orientation;
             waypointScore.Value = spaceship.WaypointScore;
+            enemyVelocity.Value = otherSpaceship.Velocity;
 
-            return new InputData(thrust.Value, targetOrient.Value, needShoot.Value, canDropMine, triggerShockwave.Value);
+            return new InputData(thrust.Value, targetOrient.Value, needShoot.Value, canDropMine.Value, triggerShockwave.Value);
         }
     }
 
