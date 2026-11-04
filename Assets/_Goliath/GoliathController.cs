@@ -61,6 +61,11 @@ namespace GoliathTeam {
             {
                 angleTolerance.Value = 10.0f; 
             }
+
+            if (hitTimeTolerance != null && hitTimeTolerance.Value <= 0)
+            {
+                hitTimeTolerance.Value = 0.1f; 
+            }
         }
 
         public override InputData UpdateInput(SpaceShipView spaceship, GameData data) {
@@ -75,6 +80,7 @@ namespace GoliathTeam {
             waypointScore.Value = spaceship.WaypointScore;
             enemyVelocity.Value = otherSpaceship.Velocity;
             timeLeftGame.Value = data.timeLeft;
+
 
             return new InputData(thrust, targetOrient, needShoot, canDropMine, triggerShockwave);
         }

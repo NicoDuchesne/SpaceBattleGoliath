@@ -25,10 +25,10 @@ public partial class CanHitCondition : Condition
 
         bool canHit = AimingHelpers.CanHit(playerVaisseau.Value.view, posEnemy.Value, enemyVelocity.Value, hitTimeTolerance.Value);
 
-        if (!canHit)
-        {
-            canHit = AimingHelpers.CanHit(playerVaisseau.Value.view, posEnemy.Value, angleTolerance.Value);
-        }
+        //if (!canHit)
+        //{
+        //    canHit = AimingHelpers.CanHit(playerVaisseau.Value.view, posEnemy.Value, angleTolerance.Value);
+        //}
 
         return canHit;
     }
