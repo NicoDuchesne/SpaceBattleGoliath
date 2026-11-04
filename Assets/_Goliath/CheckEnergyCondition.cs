@@ -3,7 +3,7 @@ using Unity.Behavior;
 using UnityEngine;
 
 [Serializable, Unity.Properties.GeneratePropertyBag]
-[Condition(name: "CheckEnergy", story: "Si [playerEnergy] est supérieur à [checkEnergy]", category: "Conditions", id: "e23db3bceefda8743717ee1ec8d103af")]
+[Condition(name: "CheckEnergy", story: "Si [playerEnergy] > [checkEnergy]", category: "Conditions", id: "e23db3bceefda8743717ee1ec8d103af")]
 public partial class CheckEnergyCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<float> playerEnergy;
@@ -11,7 +11,7 @@ public partial class CheckEnergyCondition : Condition
 
     public override bool IsTrue()
     {
-        if (playerEnergy == null || checkEnergy == null)
+        if (checkEnergy == null && playerEnergy == null)
         {
             return false;
         }

@@ -3,7 +3,7 @@ using Unity.Behavior;
 using UnityEngine;
 
 [Serializable, Unity.Properties.GeneratePropertyBag]
-[Condition(name: "Check Distance", story: "Check Distance Entre [posPlayer] et [posEnemy] par rapport a la [distanceValue]", category: "Conditions", id: "c9b827c4411eb3b62418c32c6ae873fe")]
+[Condition(name: "Check Distance superieur a distanceValue", story: "Check Distance Entre [posPlayer] et [posEnemy] > [distanceValue]", category: "Conditions", id: "c9b827c4411eb3b62418c32c6ae873fe")]
 public partial class CheckDistanceCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<Vector2> posPlayer;
