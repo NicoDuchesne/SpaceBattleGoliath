@@ -80,9 +80,22 @@ namespace GoliathTeam {
             canDropMine.Value = false;
             needShoot.Value = false;
             thrust.Value = 1f;
-            timeSinceLastShot.Value = 0f;
-            currentOwner.Value = spaceship.Owner;
 
+            if (timeSinceLastMine != null)
+            {
+                timeSinceLastMine.Value = data.timeLeft;
+            }
+
+            if (timeSinceLastShot != null)
+            {
+                timeSinceLastShot.Value = 0f;
+            }
+            
+            if(currentOwner != null)
+            {
+                currentOwner.Value = spaceship.Owner;
+            }
+            
             SpaceShipView otherSpaceship = data.GetSpaceShipForOwner(1 - spaceship.Owner);
 
             if (posPlayer != null) posPlayer.Value = spaceship.Position;
@@ -109,11 +122,17 @@ namespace GoliathTeam {
                 timeLeftGame.Value = data.timeLeft;
             }
 
-            timeSinceLastShot.Value += Time.deltaTime;
+            if(timeSinceLastShot != null)
+            {
+                timeSinceLastShot.Value += Time.deltaTime;
+                
+            }
 
-            timeSinceLastMine.Value += Time.deltaTime;
-
-
+            if (timeSinceLastMine != null)
+            {
+                timeSinceLastMine.Value += Time.deltaTime;
+            }
+            
             return new InputData(thrust, targetOrient, needShoot, canDropMine, triggerShockwave);
         }
     }
