@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Cell
+namespace GoliathTeam  { 
+    
+    public class Cell
 {
     public int x, y;
     public Vector2 worldPos;
@@ -37,37 +40,41 @@ public class NavGrid : MonoBehaviour
     private Cell[,] _grid;
     private int _gridHeight;
     private int _gridWidth;
-
-    //Testing
-    [SerializeField] private string _spaceShip1Name = "SpaceShip1";
-    [SerializeField] private string _spaceShip2Name = "SpaceShip2";
-    private Transform _spaceShip1;
-    private Transform _spaceShip2;
-    private List<Vector2> _path;
+    
+    
+    BehaviorGraphAgent behavior;
+    private BlackboardVariable<Vector2> _posPlayer;
+    private Vector2 _target;
+    private BlackboardVariable<float> _thrust;
+    private BlackboardVariable<float> _targetOrient;
+    private List<Cell> _path;
+    
     
     private void Awake()
     {
+        Debug.Log($"Awake id = {GetEntityId()}", this);
+        Debug.Log($"NavGrid Awake on {name}", this);
+        behavior = GetComponent<BehaviorGraphAgent>();
+        behavior.BlackboardReference.GetVariable("posPlayer", out _posPlayer);
+        behavior.BlackboardReference.GetVariable("thrust", out _thrust);
+        behavior.BlackboardReference.GetVariable("targetOrient", out _targetOrient);
+        
         _leftWall = GameObject.Find(_leftWallName).GetComponent<BoxCollider2D>();
         _rightWall = GameObject.Find(_rightWallName).GetComponent<BoxCollider2D>();
         _topWall = GameObject.Find(_topWallName).GetComponent<BoxCollider2D>();
         _botWall = GameObject.Find(_botWallName).GetComponent<BoxCollider2D>();
-        _spaceShip1 = GameObject.Find(_spaceShip1Name).GetComponent<Transform>();
-        _spaceShip2 = GameObject.Find(_spaceShip2Name).GetComponent<Transform>();
         BuildRect();
         BuildGrid();
     }
-
-    private void Start()
+    
+    public void Play()
     {
-    }
-
-    private void Update()
-    {
+        Debug.Log("Playing pathfinding appelé");
         UpdateGrid();
-        
-        Cell startPath = WorldPosToCrossableCell(new Vector2(_spaceShip1.position.x, _spaceShip1.position.y));
-        Cell endPath = WorldPosToCrossableCell(new Vector2(_spaceShip2.position.x, _spaceShip2.position.y));
+        Cell startPath = WorldPosToCrossableCell(new Vector2(_posPlayer.Value.x, _posPlayer.Value.y));
+        Cell endPath = WorldPosToCrossableCell(new Vector2(_target.x, _target.y));
         _path = Astar(startPath, endPath);
+        FollowPath();
     }
 
     private void BuildRect()
@@ -226,7 +233,7 @@ public class NavGrid : MonoBehaviour
         return result;
     }
 
-     public List<Vector2> Astar(Cell startCell, Cell endCell)
+     public List<Cell> Astar(Cell startCell, Cell endCell)
      {
          List<Cell> lockedCells = new List<Cell>();
          Dictionary<Cell, AStarInfos> dictInfos = new Dictionary<Cell, AStarInfos>();
@@ -273,19 +280,19 @@ public class NavGrid : MonoBehaviour
              }
          }
          
-         List<Vector2> result = new List<Vector2>();
+         List<Cell> result = new List<Cell>();
          if (currentCell == null)
          {
-             result.Add(endCell.worldPos);
+             result.Add(endCell);
          }
          else
          {
              Cell currentPathCell = endCell;
-             result.Add(endCell.worldPos);
+             result.Add(endCell);
 
              while (currentPathCell != startCell)
              {
-                 result.Add(dictInfos[currentPathCell].parentCell.worldPos);
+                 result.Add(dictInfos[currentPathCell].parentCell);
                  currentPathCell = dictInfos[currentPathCell].parentCell;
              }
              result.Reverse();
@@ -293,6 +300,29 @@ public class NavGrid : MonoBehaviour
          
          return result;
     }
+
+     private void FollowPath()
+     {
+         Cell actualCell = WorldPosToCell(_posPlayer);
+         if (_path.Contains(actualCell))
+         {
+             int i = _path.IndexOf(actualCell);
+
+             if (i + 1 < _path.Count - 1)
+             {
+                 i+=1;
+                 Cell nextCell = _path[i + 1];
+                 
+                 _thrust.Value = 1.0f;
+                 Vector2 dir = (_posPlayer.Value - nextCell.worldPos).normalized;
+                 _targetOrient.Value = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + 180f;
+             }
+             else
+             {
+                 _thrust.Value = 0.05f;
+             }
+         }
+     }
     
     private int Chebyshev(Cell firstCell, Cell secondCell)
     {
@@ -303,27 +333,33 @@ public class NavGrid : MonoBehaviour
     {
         return Mathf.Abs(secondCell.x - firstCell.x) + Mathf.Abs(secondCell.y - firstCell.y);
     }
-    
-    private void OnDrawGizmos()
+
+    public void SetTarget(Vector2 v)
     {
-        if (_leftWall == null || _rightWall == null || _topWall == null || _botWall == null) return;
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(_playableArea.center, _playableArea.size);
-        
-        if (_grid == null) return;
-        foreach (Cell n in _grid)
-        {
-            Gizmos.color = n.crossable ? new Color(1, 1, 1, 0.25f) : new Color(1, 0, 0, 0.5f);
-            Gizmos.DrawCube(n.worldPos, Vector3.one * _cellSize * 0.9f);
-            Gizmos.DrawSphere(n.worldPos, 0.05f);
-        }
-        
-        if (_path == null) return;
-        Gizmos.color = Color.green;
-        foreach (Vector2 v in _path)
-        {
-            Gizmos.DrawCube(v, Vector3.one * _cellSize * 0.9f);
-        }
+        _target = v;
     }
+    
+    // private void OnDrawGizmos()
+    // {
+    //     if (_leftWall == null || _rightWall == null || _topWall == null || _botWall == null) return;
+    //     Gizmos.color = Color.green;
+    //     Gizmos.DrawWireCube(_playableArea.center, _playableArea.size);
+    //     
+    //     if (_grid == null) return;
+    //     foreach (Cell n in _grid)
+    //     {
+    //         Gizmos.color = n.crossable ? new Color(1, 1, 1, 0.25f) : new Color(1, 0, 0, 0.5f);
+    //         Gizmos.DrawCube(n.worldPos, Vector3.one * _cellSize * 0.9f);
+    //         Gizmos.DrawSphere(n.worldPos, 0.05f);
+    //     }
+    //     
+    //     if (_path == null) return;
+    //     Gizmos.color = Color.green;
+    //     foreach (Cell v in _path)
+    //     {
+    //         Gizmos.DrawCube(v.worldPos, Vector3.one * _cellSize * 0.9f);
+    //     }
+    // }
+}
     
 }
