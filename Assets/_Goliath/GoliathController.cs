@@ -26,8 +26,7 @@ namespace GoliathTeam {
         BlackboardVariable<float> angleTolerance;
         BlackboardVariable<Vector2> enemyVelocity;
         BlackboardVariable<float> timeLeftGame;
-
-
+        BlackboardVariable<SpaceShip> enemyVaisseau;
         private static readonly FieldInfo SpaceShipField = typeof(SpaceShipView).GetField("_spaceship", BindingFlags.NonPublic | BindingFlags.Instance);//pour recup  le SpaceShip
 
         public override void Initialize(SpaceShipView spaceship, GameData data) {
@@ -50,22 +49,30 @@ namespace GoliathTeam {
             behavior.BlackboardReference.GetVariable("playerVaisseau", out playerVaisseau);
             behavior.BlackboardReference.GetVariable("enemyVelocity", out enemyVelocity);
             behavior.BlackboardReference.GetVariable("timeLeftGame", out timeLeftGame);
-            
+            behavior.BlackboardReference.GetVariable("enemyVaisseau", out enemyVaisseau);
+            behavior.BlackboardReference.GetVariable("angleTolerance", out angleTolerance);
+
             if (playerVaisseau != null && SpaceShipField != null)
             {
                 playerVaisseau.Value = SpaceShipField.GetValue(spaceship) as SpaceShip;
             }
 
-            behavior.BlackboardReference.GetVariable("angleTolerance", out angleTolerance);
             if (angleTolerance != null && angleTolerance.Value == 0)
             {
                 angleTolerance.Value = 10.0f; 
             }
 
-            if (hitTimeTolerance != null && hitTimeTolerance.Value <= 0)
-            {
-                hitTimeTolerance.Value = 0.1f; 
-            }
+            triggerShockwave.Value = false;
+            canDropMine.Value = false;
+            needShoot.Value = false;
+            thrust.Value = 1f;
+
+            SpaceShipView otherSpaceship = data.GetSpaceShipForOwner(1 - spaceship.Owner);
+
+            if (posPlayer != null) posPlayer.Value = spaceship.Position;
+            if (posEnemy != null) posEnemy.Value = otherSpaceship.Position;
+            if (enemyVelocity != null) enemyVelocity.Value = otherSpaceship.Velocity;
+            if (timeLeftGame != null) timeLeftGame.Value = data.timeLeft;
         }
 
         public override InputData UpdateInput(SpaceShipView spaceship, GameData data) {
@@ -79,8 +86,7 @@ namespace GoliathTeam {
             playerOrientation.Value = spaceship.Orientation;
             waypointScore.Value = spaceship.WaypointScore;
             enemyVelocity.Value = otherSpaceship.Velocity;
-            timeLeftGame.Value = data.timeLeft;
-
+            //timeLeftGame.Value = data.timeLeft;
 
             return new InputData(thrust, targetOrient, needShoot, canDropMine, triggerShockwave);
         }

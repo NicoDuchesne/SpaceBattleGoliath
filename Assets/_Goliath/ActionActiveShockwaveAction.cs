@@ -4,31 +4,33 @@ using UnityEngine;
 using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
-[Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Action Active Shockwave", story: "Action activer qui passe ShockWave en true [triggerShockwave]", category: "Action", id: "2a02bee7379add435b76cc579b43ea2c")]
-public partial class ActionActiveShockwaveAction : Action
+namespace GoliathTeam
 {
-    [SerializeReference] public BlackboardVariable<bool> triggerShockwave;
-
-    protected override Status OnStart()
+    [Serializable, GeneratePropertyBag]
+    [NodeDescription(name: "Action Active Shockwave", story: "Action activer qui passe ShockWave en true [triggerShockwave]", category: "Action", id: "2a02bee7379add435b76cc579b43ea2c")]
+    public partial class ActionActiveShockwaveAction : Action
     {
-        return Status.Running;
-    }
+        [SerializeReference] public BlackboardVariable<bool> triggerShockwave;
 
-    protected override Status OnUpdate()
-    {
-        if (triggerShockwave == null)
+        protected override Status OnStart()
         {
-            return Status.Failure;
+            return Status.Running;
         }
 
-        triggerShockwave.Value = true;
+        protected override Status OnUpdate()
+        {
+            if (triggerShockwave == null)
+            {
+                return Status.Failure;
+            }
 
-        return Status.Success;
-    }
+            triggerShockwave.Value = true;
 
-    protected override void OnEnd()
-    {
+            return Status.Success;
+        }
+
+        protected override void OnEnd()
+        {
+        }
     }
 }
-

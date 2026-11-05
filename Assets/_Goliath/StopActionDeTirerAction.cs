@@ -4,27 +4,29 @@ using UnityEngine;
 using Action = Unity.Behavior.Action;
 using Unity.Properties;
 
-[Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Stop Action de Tirer", story: "Action de Stop de tir passe en true[needShoot] passe en false", category: "Action", id: "058bf4998e8e25a500576d4c4992eb8f")]
-public partial class StopActionDeTirerAction : Action
+namespace GoliathTeam
 {
-    [SerializeReference] public BlackboardVariable<bool> needShoot;
-
-    protected override Status OnStart()
+    [Serializable, GeneratePropertyBag]
+    [NodeDescription(name: "Stop Action de Tirer", story: "Action de Stop de tir passe en true[needShoot] passe en false", category: "Action", id: "058bf4998e8e25a500576d4c4992eb8f")]
+    public partial class StopActionDeTirerAction : Action
     {
-        return Status.Running;
-    }
+        [SerializeReference] public BlackboardVariable<bool> needShoot;
 
-    protected override Status OnUpdate()
-    {
-        if (needShoot == null)
+        protected override Status OnStart()
         {
-            return Status.Failure;
+            return Status.Running;
         }
 
-        needShoot.Value = false;
+        protected override Status OnUpdate()
+        {
+            if (needShoot == null)
+            {
+                return Status.Failure;
+            }
 
-        return Status.Success;
+            needShoot.Value = false;
+
+            return Status.Success;
+        }
     }
 }
-

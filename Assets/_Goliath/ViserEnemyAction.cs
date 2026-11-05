@@ -2,36 +2,58 @@ using DoNotModify;
 using System;
 using Unity.Behavior;
 using Unity.Properties;
+using UnityEditor.Build;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
 
-[Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Viser Enemy", story: "Viser[posEnemy] depuis[playerVaisseau] [overshootFactor] et [targetOrient] et avec[thrust]", category: "Action", id: "9ce164da1972ebf043dabd055be53a47")]
-public partial class ViserEnemyAction : Action
+namespace GoliathTeam
 {
-    [SerializeReference] public BlackboardVariable<Vector2> posEnemy;
-    [SerializeReference] public BlackboardVariable<float> thrust;
-    [SerializeReference] public BlackboardVariable<float> targetOrient;
-    [SerializeReference] public BlackboardVariable<float> overshootFactor;
-    [SerializeReference] public BlackboardVariable<SpaceShip> playerVaisseau;
-
-    protected override Status OnStart()
+    [Serializable, GeneratePropertyBag]
+    [NodeDescription(name: "Viser Enemy", story: "[enemyVelocity] [posPlayer] Viser[posEnemy] depuis[playerVaisseau] [overshootFactor] et [targetOrient] et avec[thrust]", category: "Action", id: "9ce164da1972ebf043dabd055be53a47")]
+    public partial class ViserEnemyAction : Action
     {
-        return Status.Running;
-    }
+        [SerializeReference] public BlackboardVariable<Vector2> posEnemy;
+        [SerializeReference] public BlackboardVariable<Vector2> posPlayer;
 
-    protected override Status OnUpdate()
-    {
-        if (posEnemy == null || thrust == null || targetOrient == null || overshootFactor == null || playerVaisseau == null || playerVaisseau.Value == null)
+        [SerializeReference] public BlackboardVariable<float> thrust;
+        [SerializeReference] public BlackboardVariable<float> targetOrient;
+        [SerializeReference] public BlackboardVariable<float> overshootFactor;
+        [SerializeReference] public BlackboardVariable<SpaceShip> playerVaisseau;
+
+        [SerializeReference] public BlackboardVariable<Vector2> enemyVelocity;
+
+        protected override Status OnStart()
         {
-            return Status.Failure;
+            return Status.Running;
         }
 
-        thrust.Value = 0.0f;
+        protected override Status OnUpdate()
+        {
+            if (posEnemy == null || posPlayer == null || thrust == null || targetOrient == null || enemyVelocity == null)
+            {
+                return Status.Failure;
+            }
 
-        float shootValue = AimingHelpers.ComputeSteeringOrient(playerVaisseau.Value.view, posEnemy.Value, overshootFactor.Value);
-        targetOrient.Value = shootValue + 180f;
-        return Status.Success;
+            thrust.Value = 0.0f;
+
+            if (posPlayer.Value == posEnemy.Value)
+            {
+                return Status.Running;
+            }
+
+            float distance = Vector2.Distance(posPlayer.Value, posEnemy.Value);
+
+            float timeToReach = distance / Bullet.Speed;
+
+            Vector2 futureEnemyPos = posEnemy.Value + (enemyVelocity.Value * timeToReach);
+
+            Vector2 aimDirection = (futureEnemyPos - posPlayer.Value).normalized;
+
+            targetOrient.Value = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
+
+            return Status.Success;
+        }
+
     }
 }
 
