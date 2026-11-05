@@ -28,6 +28,9 @@ namespace GoliathTeam {
         BlackboardVariable<float> timeLeftGame;
         BlackboardVariable<SpaceShip> enemyVaisseau;
         BlackboardVariable<float> timeSinceLastShot;
+        BlackboardVariable<float> timeSinceLastMine;
+        BlackboardVariable<int> currentOwner;
+
 
         private static readonly FieldInfo SpaceShipField = typeof(SpaceShipView).GetField("_spaceship", BindingFlags.NonPublic | BindingFlags.Instance);//pour recup  le SpaceShip
 
@@ -54,7 +57,9 @@ namespace GoliathTeam {
             behavior.BlackboardReference.GetVariable("enemyVaisseau", out enemyVaisseau);
             behavior.BlackboardReference.GetVariable("angleTolerance", out angleTolerance);
             behavior.BlackboardReference.GetVariable("timeSinceLastShot", out timeSinceLastShot);
-
+            behavior.BlackboardReference.GetVariable("timeSinceLastMine", out timeSinceLastMine);
+            behavior.BlackboardReference.GetVariable("currentOwner", out currentOwner);
+            
 
             if (playerVaisseau != null && SpaceShipField != null)
             {
@@ -76,6 +81,7 @@ namespace GoliathTeam {
             needShoot.Value = false;
             thrust.Value = 1f;
             timeSinceLastShot.Value = 0f;
+            currentOwner.Value = spaceship.Owner;
 
             SpaceShipView otherSpaceship = data.GetSpaceShipForOwner(1 - spaceship.Owner);
 
@@ -97,12 +103,16 @@ namespace GoliathTeam {
             waypointScore.Value = spaceship.WaypointScore;
             enemyVelocity.Value = otherSpaceship.Velocity;
 
+
             if (timeLeftGame != null)
             {
                 timeLeftGame.Value = data.timeLeft;
             }
 
             timeSinceLastShot.Value += Time.deltaTime;
+
+            timeSinceLastMine.Value += Time.deltaTime;
+
 
             return new InputData(thrust, targetOrient, needShoot, canDropMine, triggerShockwave);
         }
