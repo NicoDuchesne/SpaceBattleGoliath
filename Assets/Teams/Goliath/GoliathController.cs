@@ -27,6 +27,11 @@ namespace GoliathTeam {
         BlackboardVariable<Vector2> enemyVelocity;
         BlackboardVariable<float> timeLeftGame;
         BlackboardVariable<SpaceShip> enemyVaisseau;
+        BlackboardVariable<float> timeSinceLastShot;
+        BlackboardVariable<float> timeSinceLastMine;
+        BlackboardVariable<int> currentOwner;
+
+
         private static readonly FieldInfo SpaceShipField = typeof(SpaceShipView).GetField("_spaceship", BindingFlags.NonPublic | BindingFlags.Instance);//pour recup  le SpaceShip
 
         public override void Initialize(SpaceShipView spaceship, GameData data) {
@@ -51,6 +56,10 @@ namespace GoliathTeam {
             behavior.BlackboardReference.GetVariable("timeLeftGame", out timeLeftGame);
             behavior.BlackboardReference.GetVariable("enemyVaisseau", out enemyVaisseau);
             behavior.BlackboardReference.GetVariable("angleTolerance", out angleTolerance);
+            behavior.BlackboardReference.GetVariable("timeSinceLastShot", out timeSinceLastShot);
+            behavior.BlackboardReference.GetVariable("timeSinceLastMine", out timeSinceLastMine);
+            behavior.BlackboardReference.GetVariable("currentOwner", out currentOwner);
+            
 
             if (playerVaisseau != null && SpaceShipField != null)
             {
@@ -62,10 +71,17 @@ namespace GoliathTeam {
                 angleTolerance.Value = 10.0f; 
             }
 
+            if (timeLeftGame != null)
+            {
+                timeLeftGame.Value = data.timeLeft;
+            }
+
             triggerShockwave.Value = false;
             canDropMine.Value = false;
             needShoot.Value = false;
             thrust.Value = 1f;
+            timeSinceLastShot.Value = 0f;
+            currentOwner.Value = spaceship.Owner;
 
             SpaceShipView otherSpaceship = data.GetSpaceShipForOwner(1 - spaceship.Owner);
 
@@ -86,7 +102,17 @@ namespace GoliathTeam {
             playerOrientation.Value = spaceship.Orientation;
             waypointScore.Value = spaceship.WaypointScore;
             enemyVelocity.Value = otherSpaceship.Velocity;
-            //timeLeftGame.Value = data.timeLeft;
+
+
+            if (timeLeftGame != null)
+            {
+                timeLeftGame.Value = data.timeLeft;
+            }
+
+            timeSinceLastShot.Value += Time.deltaTime;
+
+            timeSinceLastMine.Value += Time.deltaTime;
+
 
             return new InputData(thrust, targetOrient, needShoot, canDropMine, triggerShockwave);
         }
