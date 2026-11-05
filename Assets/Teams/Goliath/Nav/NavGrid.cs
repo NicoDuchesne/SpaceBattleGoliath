@@ -44,16 +44,14 @@ public class NavGrid : MonoBehaviour
     
     BehaviorGraphAgent behavior;
     private BlackboardVariable<Vector2> _posPlayer;
-    private Vector2 _target;
     private BlackboardVariable<float> _thrust;
     private BlackboardVariable<float> _targetOrient;
     private List<Cell> _path;
+    private Vector2 _target;
     
     
     private void Awake()
     {
-        Debug.Log($"Awake id = {GetEntityId()}", this);
-        Debug.Log($"NavGrid Awake on {name}", this);
         behavior = GetComponent<BehaviorGraphAgent>();
         behavior.BlackboardReference.GetVariable("posPlayer", out _posPlayer);
         behavior.BlackboardReference.GetVariable("thrust", out _thrust);
@@ -69,7 +67,6 @@ public class NavGrid : MonoBehaviour
     
     public void Play()
     {
-        Debug.Log("Playing pathfinding appelé");
         UpdateGrid();
         Cell startPath = WorldPosToCrossableCell(new Vector2(_posPlayer.Value.x, _posPlayer.Value.y));
         Cell endPath = WorldPosToCrossableCell(new Vector2(_target.x, _target.y));
@@ -304,24 +301,51 @@ public class NavGrid : MonoBehaviour
      private void FollowPath()
      {
          Cell actualCell = WorldPosToCell(_posPlayer);
+         Cell nextCell;
+         
          if (_path.Contains(actualCell))
          {
              int i = _path.IndexOf(actualCell);
-
+            
              if (i + 1 < _path.Count - 1)
              {
-                 i+=1;
-                 Cell nextCell = _path[i + 1];
+                 nextCell = _path[i + 1];
                  
                  _thrust.Value = 1.0f;
                  Vector2 dir = (_posPlayer.Value - nextCell.worldPos).normalized;
                  _targetOrient.Value = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + 180f;
              }
+             // else if (i + 1 < _path.Count - 1)
+             // {
+             //     nextCell = _path[i + 1];
+             //     
+             //     _thrust.Value = 1.0f;
+             //     Vector2 dir = (_posPlayer.Value - nextCell.worldPos).normalized;
+             //     _targetOrient.Value = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + 180f;
+             // }
              else
              {
                  _thrust.Value = 0.05f;
              }
          }
+     }
+
+     private Cell GetClosestCellOnPath()
+     {
+         Cell closest = _path[0];
+         float minDist = float.MaxValue;
+         
+         foreach (Cell c in _path)
+         {
+             float dist = Vector2.Distance(_posPlayer.Value, c.worldPos);
+             if (minDist > dist)
+             {
+                 minDist = dist;
+                 closest = c;
+             }
+         }
+         
+         return closest;
      }
     
     private int Chebyshev(Cell firstCell, Cell secondCell)
@@ -339,27 +363,27 @@ public class NavGrid : MonoBehaviour
         _target = v;
     }
     
-    // private void OnDrawGizmos()
-    // {
-    //     if (_leftWall == null || _rightWall == null || _topWall == null || _botWall == null) return;
-    //     Gizmos.color = Color.green;
-    //     Gizmos.DrawWireCube(_playableArea.center, _playableArea.size);
-    //     
-    //     if (_grid == null) return;
-    //     foreach (Cell n in _grid)
-    //     {
-    //         Gizmos.color = n.crossable ? new Color(1, 1, 1, 0.25f) : new Color(1, 0, 0, 0.5f);
-    //         Gizmos.DrawCube(n.worldPos, Vector3.one * _cellSize * 0.9f);
-    //         Gizmos.DrawSphere(n.worldPos, 0.05f);
-    //     }
-    //     
-    //     if (_path == null) return;
-    //     Gizmos.color = Color.green;
-    //     foreach (Cell v in _path)
-    //     {
-    //         Gizmos.DrawCube(v.worldPos, Vector3.one * _cellSize * 0.9f);
-    //     }
-    // }
+    private void OnDrawGizmos()
+    {
+        if (_leftWall == null || _rightWall == null || _topWall == null || _botWall == null) return;
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(_playableArea.center, _playableArea.size);
+        
+        if (_grid == null) return;
+        foreach (Cell n in _grid)
+        {
+            Gizmos.color = n.crossable ? new Color(1, 1, 1, 0.25f) : new Color(1, 0, 0, 0.5f);
+            Gizmos.DrawCube(n.worldPos, Vector3.one * _cellSize * 0.9f);
+            Gizmos.DrawSphere(n.worldPos, 0.05f);
+        }
+        
+        if (_path == null) return;
+        Gizmos.color = Color.green;
+        foreach (Cell v in _path)
+        {
+            Gizmos.DrawCube(v.worldPos, Vector3.one * _cellSize * 0.9f);
+        }
+    }
 }
     
 }
