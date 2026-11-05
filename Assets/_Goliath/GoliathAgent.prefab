@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3513663720462501619}
   - component: {fileID: 8150750571803244730}
   - component: {fileID: 6848433148373741474}
+  - component: {fileID: 7519161010769046139}
   m_Layer: 0
   m_Name: GoliathAgent
   m_TagString: Untagged
@@ -76,3 +77,23 @@ MonoBehaviour:
           m_Value1: 0
         Name: Self
         m_Value: {fileID: 2872623285528030467}
+--- !u!114 &7519161010769046139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2872623285528030467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81cd46ae8f7382a46b9da3a6294e61c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GoliathTeam.NavGrid
+  _leftWallName: LeftWall
+  _rightWallName: RightWall
+  _topWallName: TopWall
+  _botWallName: BottomWall
+  _cellSize: 0.5
+  _obstacleTags:
+  - Asteroid
+  - Mine
