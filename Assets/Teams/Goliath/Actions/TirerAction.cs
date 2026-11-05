@@ -29,7 +29,7 @@ namespace GoliathTeam
             {
                 timeSinceLastShot.Value = 0f;
             }
-            Debug.Log("salut salut salut salut salut salut");
+
             needShoot.Value = true;
 
             return Status.Success;
