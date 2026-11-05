@@ -44,16 +44,14 @@ public class NavGrid : MonoBehaviour
     
     BehaviorGraphAgent behavior;
     private BlackboardVariable<Vector2> _posPlayer;
-    private Vector2 _target;
     private BlackboardVariable<float> _thrust;
     private BlackboardVariable<float> _targetOrient;
     private List<Cell> _path;
+    private Vector2 _target;
     
     
     private void Awake()
     {
-        Debug.Log($"Awake id = {GetEntityId()}", this);
-        Debug.Log($"NavGrid Awake on {name}", this);
         behavior = GetComponent<BehaviorGraphAgent>();
         behavior.BlackboardReference.GetVariable("posPlayer", out _posPlayer);
         behavior.BlackboardReference.GetVariable("thrust", out _thrust);
@@ -317,18 +315,18 @@ public class NavGrid : MonoBehaviour
                  Vector2 dir = (_posPlayer.Value - nextCell.worldPos).normalized;
                  _targetOrient.Value = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + 180f;
              }
+             // else if (i + 1 < _path.Count - 1)
+             // {
+             //     nextCell = _path[i + 1];
+             //     
+             //     _thrust.Value = 1.0f;
+             //     Vector2 dir = (_posPlayer.Value - nextCell.worldPos).normalized;
+             //     _targetOrient.Value = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + 180f;
+             // }
              else
              {
                  _thrust.Value = 0.05f;
              }
-         }
-         else
-         {
-             nextCell = GetClosestCellOnPath();
-             
-             _thrust.Value = 1.0f;
-             Vector2 dir = (_posPlayer.Value - nextCell.worldPos).normalized;
-             _targetOrient.Value = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + 180f;
          }
      }
 
