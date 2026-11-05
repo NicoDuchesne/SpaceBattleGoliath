@@ -25,6 +25,9 @@ namespace GoliathTeam {
         BlackboardVariable<SpaceShip> playerVaisseau;
         BlackboardVariable<float> angleTolerance;
         BlackboardVariable<Vector2> enemyVelocity;
+        BlackboardVariable<float> timeLeftGame;
+        BlackboardVariable<SpaceShip> enemyVaisseau;
+
 
 
         private static readonly FieldInfo SpaceShipField = typeof(SpaceShipView).GetField("_spaceship", BindingFlags.NonPublic | BindingFlags.Instance);//pour recup  le SpaceShip
@@ -48,7 +51,9 @@ namespace GoliathTeam {
             behavior.BlackboardReference.GetVariable("hitTimeTolerance", out hitTimeTolerance);
             behavior.BlackboardReference.GetVariable("playerVaisseau", out playerVaisseau);
             behavior.BlackboardReference.GetVariable("enemyVelocity", out enemyVelocity);
-
+            behavior.BlackboardReference.GetVariable("timeLeftGame", out timeLeftGame);
+            behavior.BlackboardReference.GetVariable("enemyVaisseau", out enemyVaisseau);
+            
             if (playerVaisseau != null && SpaceShipField != null)
             {
                 playerVaisseau.Value = SpaceShipField.GetValue(spaceship) as SpaceShip;
@@ -59,6 +64,7 @@ namespace GoliathTeam {
             {
                 angleTolerance.Value = 10.0f; 
             }
+
         }
 
         public override InputData UpdateInput(SpaceShipView spaceship, GameData data) {
@@ -72,8 +78,9 @@ namespace GoliathTeam {
             playerOrientation.Value = spaceship.Orientation;
             waypointScore.Value = spaceship.WaypointScore;
             enemyVelocity.Value = otherSpaceship.Velocity;
+            timeLeftGame.Value = data.timeLeft;
 
-            return new InputData(thrust.Value, targetOrient.Value, needShoot.Value, canDropMine.Value, triggerShockwave.Value);
+            return new InputData(thrust, targetOrient, needShoot, canDropMine, triggerShockwave);
         }
     }
 
