@@ -124,8 +124,7 @@ namespace GoliathTeam {
 
             if(timeSinceLastShot != null)
             {
-                timeSinceLastShot.Value += Time.deltaTime;
-                
+                timeSinceLastShot.Value += Time.deltaTime; 
             }
 
             if (timeSinceLastMine != null)
