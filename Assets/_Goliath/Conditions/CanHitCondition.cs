@@ -33,5 +33,5 @@ namespace GoliathTeam
 
             return canHit;
         }
-}
+    }
 }
