@@ -15,7 +15,7 @@ public partial class CanHitCondition : Condition
     [SerializeReference] public BlackboardVariable<SpaceShip> playerVaisseau;
     [SerializeReference] public BlackboardVariable<float> angleTolerance;
     [SerializeReference] public BlackboardVariable<Vector2> enemyVelocity;
-    
+
     public override bool IsTrue()
     {
         if (posPlayer == null || posEnemy == null || playerOrientation == null || hitTimeTolerance == null || enemyVelocity == null || playerVaisseau == null)
@@ -25,10 +25,10 @@ public partial class CanHitCondition : Condition
 
         bool canHit = AimingHelpers.CanHit(playerVaisseau.Value.view, posEnemy.Value, enemyVelocity.Value, hitTimeTolerance.Value);
 
-        //if (!canHit)
-        //{
-        //    canHit = AimingHelpers.CanHit(playerVaisseau.Value.view, posEnemy.Value, angleTolerance.Value);
-        //}
+        if (!canHit)
+        {
+            canHit = AimingHelpers.CanHit(playerVaisseau.Value.view, posEnemy.Value, angleTolerance.Value);
+        }
 
         return canHit;
     }
