@@ -27,9 +27,6 @@ namespace GoliathTeam {
         BlackboardVariable<Vector2> enemyVelocity;
         BlackboardVariable<float> timeLeftGame;
         BlackboardVariable<SpaceShip> enemyVaisseau;
-
-
-
         private static readonly FieldInfo SpaceShipField = typeof(SpaceShipView).GetField("_spaceship", BindingFlags.NonPublic | BindingFlags.Instance);//pour recup  le SpaceShip
 
         public override void Initialize(SpaceShipView spaceship, GameData data) {

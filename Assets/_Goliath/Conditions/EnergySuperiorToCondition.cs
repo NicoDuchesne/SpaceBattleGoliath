@@ -13,12 +13,4 @@ public partial class EnergySuperiorToCondition : Condition
     {
         return Energy.Value > Value.Value;
     }
-
-    public override void OnStart()
-    {
-    }
-
-    public override void OnEnd()
-    {
-    }
 }
